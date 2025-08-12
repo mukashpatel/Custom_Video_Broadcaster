@@ -18,7 +18,8 @@ streaming = Streaming()
 
 @app.get("/")
 def serve_ui():
-    return FileResponse("static/index.html")
+    #  return FileResponse("static/3d_background.html")
+     return FileResponse("static/index.html")
 
 
 @app.get("/start")
@@ -65,6 +66,10 @@ def stop_stream():
 def devices():
     return streaming.list_available_devices()
 
+
+@app.get("/3d-background")
+async def get_3d_background():
+    return FileResponse("static/3d_background.html")
 
 @app.get("/favicon.ico")
 async def favicon():

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Broadcasting Background</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        #canvas {
+            display: block;
+        }
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+        }
+        .controls button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .controls button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+        .controls button.active {
+            background: #2196F3;
+        }
+        .controls label {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-size: 12px;
+        }
+        .controls input[type="range"] {
+            width: 120px;
+        }
+        .info {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="controls">
+        <h3>3D Background Controls</h3>
+        <button id="scene1" class="active">Corporate</button>
+        <button id="scene2">Cyber</button>
+        <button id="scene3">Particles</button>
+        <button id="scene4">Geometric</button>
+        
+        <label>Animation Speed</label>
+        <input type="range" id="speed" min="0.1" max="2" step="0.1" value="1">
+        
+        <label>Particle Count</label>
+        <input type="range" id="particles" min="50" max="500" step="50" value="200">
+        
+        <label>Color Intensity</label>
+        <input type="range" id="intensity" min="0.3" max="1.5" step="0.1" value="1">
+        
+        <button id="fullscreen">Fullscreen</button>
+    </div>
+    
+    <div class="info">
+        Press F11 for fullscreen • Perfect for video broadcasting
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let particles = [];
+        let geometryObjects = [];
+        let currentScene = 1;
+        let animationSpeed = 1;
+        let particleCount = 200;
+        let colorIntensity = 1;
+        let time = 0;
+
+        // Initialize Three.js
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x0a0a0a, 1);
+            
+            // Enable shadows
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            
+            createScene1(); // Start with corporate scene
+            
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(50, 50, 50);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            animate();
+        }
+        
+        // Corporate/Professional Scene
+        function createScene1() {
+            clearScene();
+            scene.fog = new THREE.Fog(0x1a1a2e, 10, 100);
+            
+            // Animated grid background
+            const gridHelper = new THREE.GridHelper(100, 50, 0x16213e, 0x0f172a);
+            gridHelper.position.y = -10;
+            scene.add(gridHelper);
+            
+            // Floating geometric shapes
+            const shapes = [
+                new THREE.BoxGeometry(2, 2, 2),
+                new THREE.SphereGeometry(1.5, 16, 16),
+                new THREE.ConeGeometry(1, 2, 8)
+            ];
+            
+            for (let i = 0; i < 15; i++) {
+                const geometry = shapes[i % 3];
+                const material = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL((i * 0.1) % 1, 0.7, 0.5 * colorIntensity),
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 60,
+                    (Math.random() - 0.5) * 30,
+                    (Math.random() - 0.5) * 40
+                );
+                mesh.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                
+                geometryObjects.push(mesh);
+                scene.add(mesh);
+            }
+        }
+        
+        // Cyber/Tech Scene
+        function createScene2() {
+            clearScene();
+            scene.fog = new THREE.Fog(0x000011, 5, 80);
+            
+            // Digital grid effect
+            const wireframeGeometry = new THREE.PlaneGeometry(100, 100, 20, 20);
+            const wireframeMaterial = new THREE.MeshBasicMaterial({
+                color: 0x00ff88,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.3
+            });
+            
+            const wireframePlane = new THREE.Mesh(wireframeGeometry, wireframeMaterial);
+            wireframePlane.rotation.x = -Math.PI / 2;
+            wireframePlane.position.y = -15;
+            scene.add(wireframePlane);
+            
+            // Neon tubes
+            for (let i = 0; i < 20; i++) {
+                const tubeGeometry = new THREE.CylinderGeometry(0.1, 0.1, 15, 8);
+                const tubeMaterial = new THREE.MeshBasicMaterial({
+                    color: new THREE.Color().setHSL(0.5 + (i * 0.05), 1, 0.5 * colorIntensity),
+                    transparent: true,
+                    opacity: 0.8
+                });
+                
+                const tube = new THREE.Mesh(tubeGeometry, tubeMaterial);
+                tube.position.set(
+                    (Math.random() - 0.5) * 80,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 60
+                );
+                tube.rotation.z = Math.random() * Math.PI;
+                
+                geometryObjects.push(tube);
+                scene.add(tube);
+            }
+        }
+        
+        // Particle Field Scene
+        function createScene3() {
+            clearScene();
+            scene.fog = new THREE.Fog(0x1a0a2e, 20, 100);
+            
+            // Create particle system
+            const particleGeometry = new THREE.BufferGeometry();
+            const particlePositions = [];
+            const particleColors = [];
+            
+            for (let i = 0; i < particleCount; i++) {
+                particlePositions.push(
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100,
+                    (Math.random() - 0.5) * 100
+                );
+                
+                const color = new THREE.Color().setHSL(Math.random(), 0.8, 0.6 * colorIntensity);
+                particleColors.push(color.r, color.g, color.b);
+            }
+            
+            particleGeometry.setAttribute('position', new THREE.Float32BufferAttribute(particlePositions, 3));
+            particleGeometry.setAttribute('color', new THREE.Float32BufferAttribute(particleColors, 3));
+            
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 2,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+            particles.push(particleSystem);
+            scene.add(particleSystem);
+        }
+        
+        // Geometric Abstract Scene
+        function createScene4() {
+            clearScene();
+            scene.fog = new THREE.Fog(0x2a1a4a, 15, 90);
+            
+            // Create abstract geometric composition
+            const geometries = [
+                new THREE.IcosahedronGeometry(3, 0),
+                new THREE.OctahedronGeometry(2.5),
+                new THREE.TetrahedronGeometry(3),
+                new THREE.DodecahedronGeometry(2)
+            ];
+            
+            for (let i = 0; i < 25; i++) {
+                const geometry = geometries[i % 4];
+                const material = new THREE.MeshPhongMaterial({
+                    color: new THREE.Color().setHSL((i * 0.08) % 1, 0.8, 0.6 * colorIntensity),
+                    transparent: true,
+                    opacity: 0.7,
+                    wireframe: Math.random() > 0.5
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 70,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 50
+                );
+                
+                geometryObjects.push(mesh);
+                scene.add(mesh);
+            }
+        }
+        
+        function clearScene() {
+            // Remove all objects
+            while(scene.children.length > 0) {
+                scene.remove(scene.children[0]);
+            }
+            particles = [];
+            geometryObjects = [];
+            scene.fog = null;
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01 * animationSpeed;
+            
+            // Animate based on current scene
+            switch(currentScene) {
+                case 1:
+                    animateScene1();
+                    break;
+                case 2:
+                    animateScene2();
+                    break;
+                case 3:
+                    animateScene3();
+                    break;
+                case 4:
+                    animateScene4();
+                    break;
+            }
+            
+            // Camera movement
+            camera.position.x = Math.sin(time * 0.3) * 5;
+            camera.position.y = Math.cos(time * 0.2) * 3;
+            camera.lookAt(0, 0, 0);
+            
+            renderer.render(scene, camera);
+        }
+        
+        function animateScene1() {
+            geometryObjects.forEach((obj, index) => {
+                obj.rotation.x += 0.01 * animationSpeed;
+                obj.rotation.y += 0.015 * animationSpeed;
+                obj.position.y += Math.sin(time + index) * 0.02;
+            });
+        }
+        
+        function animateScene2() {
+            geometryObjects.forEach((obj, index) => {
+                obj.material.opacity = 0.5 + Math.sin(time * 2 + index) * 0.3;
+                obj.rotation.z += 0.02 * animationSpeed;
+            });
+        }
+        
+        function animateScene3() {
+            particles.forEach(particleSystem => {
+                particleSystem.rotation.x += 0.005 * animationSpeed;
+                particleSystem.rotation.y += 0.01 * animationSpeed;
+                
+                const positions = particleSystem.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] += Math.sin(time + i) * 0.1;
+                }
+                particleSystem.geometry.attributes.position.needsUpdate = true;
+            });
+        }
+        
+        function animateScene4() {
+            geometryObjects.forEach((obj, index) => {
+                obj.rotation.x += (0.01 + index * 0.001) * animationSpeed;
+                obj.rotation.y += (0.015 + index * 0.001) * animationSpeed;
+                obj.rotation.z += (0.008 + index * 0.001) * animationSpeed;
+                obj.position.z += Math.sin(time + index) * 0.03;
+            });
+        }
+        
+        // Event listeners
+        document.getElementById('scene1').addEventListener('click', () => {
+            currentScene = 1;
+            createScene1();
+            updateActiveButton('scene1');
+        });
+        
+        document.getElementById('scene2').addEventListener('click', () => {
+            currentScene = 2;
+            createScene2();
+            updateActiveButton('scene2');
+        });
+        
+        document.getElementById('scene3').addEventListener('click', () => {
+            currentScene = 3;
+            createScene3();
+            updateActiveButton('scene3');
+        });
+        
+        document.getElementById('scene4').addEventListener('click', () => {
+            currentScene = 4;
+            createScene4();
+            updateActiveButton('scene4');
+        });
+        
+        document.getElementById('speed').addEventListener('input', (e) => {
+            animationSpeed = parseFloat(e.target.value);
+        });
+        
+        document.getElementById('particles').addEventListener('input', (e) => {
+            particleCount = parseInt(e.target.value);
+            if (currentScene === 3) createScene3();
+        });
+        
+        document.getElementById('intensity').addEventListener('input', (e) => {
+            colorIntensity = parseFloat(e.target.value);
+            // Recreate current scene with new intensity
+            switch(currentScene) {
+                case 1: createScene1(); break;
+                case 2: createScene2(); break;
+                case 3: createScene3(); break;
+                case 4: createScene4(); break;
+            }
+        });
+        
+        document.getElementById('fullscreen').addEventListener('click', () => {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        });
+        
+        function updateActiveButton(activeId) {
+            document.querySelectorAll('.controls button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
