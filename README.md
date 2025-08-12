@@ -56,10 +56,7 @@ This platform is ideal for:
 ---
 
 ## 📦 Project Structure
-- `main.py` — FastAPI server and endpoints
-- `stream_utils.py` — Streaming logic and device management
-- `engine.py` — AI segmentation and background processing
-- `static/` — Web UI and assets
+```
 .
 ├── .gitignore
 ├── engine.py
@@ -71,6 +68,14 @@ This platform is ideal for:
 │   ├── background.jpeg
 │   └── index.html
 └── stream_utils.py
+```
+
+- `main.py`: The main application file that defines the FastAPI app and its endpoints.
+- `engine.py`: Contains the logic for managing video streaming.
+- `model.py`: Defines the data models used in the application.
+- `stream_utils.py`: Utility functions for streaming operations.
+- `static/`: Directory containing static files, including HTML and images.
+- `static/index.html`: The front-end interface for controlling the virtual camera.
 ---
 
 ## 🛠️ Troubleshooting & Tips
