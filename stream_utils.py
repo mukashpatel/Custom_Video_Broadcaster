@@ -110,6 +110,12 @@ class Streaming(CustomerSegmentationWithYOLO):
                             result_frame = self.apply_custom_background(frame, mask)
                         elif self.background == "virtual":
                             result_frame = self.apply_virtual_background(frame, mask)
+                        elif self.background == "3d_grid":
+                            bg = self.render_3d_grid_background(width, height, t=frame_idx / (self.fps or self.original_fps))
+                            result_frame = self.apply_dynamic_background(frame, mask, bg)
+                        elif self.background == "starfield":
+                            bg = self.render_starfield_background(width, height)
+                            result_frame = self.apply_dynamic_background(frame, mask, bg)
                         else:
                             result_frame = frame  # fallback
                     else:

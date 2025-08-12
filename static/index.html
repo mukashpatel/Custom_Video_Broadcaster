@@ -239,6 +239,8 @@
           <option value="blur">Blur Effect</option>
           <option value="default" selected>Default Background</option>
           <option value="virtual">Virtual Background</option>
+          <option value="3d_grid">3D Neon Grid</option>
+          <option value="starfield">3D Starfield</option>
         </select>
       </div>
 
@@ -293,7 +295,7 @@
       status.style.display = 'block';
       status.textContent = 'Starting stream...';
 
-      fetch(`/start?source=${source}&fps=${fps}&blur=${blur}&background=${background}`)
+      fetch(`/start?source=${source}&fps=${fps}&blur_strength=${blur}&background=${background}`)
         .then(() => {
           setTimeout(() => {
             status.textContent = 'Stream is live!';
