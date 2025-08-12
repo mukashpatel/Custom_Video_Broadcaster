@@ -4,7 +4,7 @@ A professional, AI-powered video broadcasting platform for real-time background 
 
 ---
 
-![App Interface](static/Screenshot%202025-07-06%20022333.png)
+![App Interface](static/UI.png)
 
 ---
 
