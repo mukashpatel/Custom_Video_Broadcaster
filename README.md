@@ -60,7 +60,17 @@ This platform is ideal for:
 - `stream_utils.py` — Streaming logic and device management
 - `engine.py` — AI segmentation and background processing
 - `static/` — Web UI and assets
-
+.
+├── .gitignore
+├── engine.py
+├── main.py
+├── model.py
+├── README.md
+├── requirements.txt
+├── static
+│   ├── background.jpeg
+│   └── index.html
+└── stream_utils.py
 ---
 
 ## 🛠️ Troubleshooting & Tips
